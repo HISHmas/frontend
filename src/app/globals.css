@@ -1,15 +1,15 @@
 @import 'tailwindcss';
 
+/* 라이트 모드 기본 색 */
 :root {
-  --font-geist-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-geist-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    --background: #ffffff;
+    --foreground: #161d24;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
 }
 
 @media (prefers-color-scheme: dark) {
