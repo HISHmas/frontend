@@ -24,3 +24,15 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@font-face {
+    font-family: 'OwnglyphPDH';
+    src: url('/fonts/OwnglyphPDH.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+body {
+    font-family: 'OwnglyphPDH', sans-serif;
+}
