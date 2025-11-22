@@ -3,7 +3,7 @@ export default function LoginButton({ children }: { children?: React.ReactNode }
     <button
       type="submit"
       className="
-        w-full h-10 bg-red-600 text-white rounded-lg
+        w-[200px] h-10 bg-red-600 text-white rounded-lg
         flex items-center justify-center
         hover:opacity-90 active:opacity-80
         transition
