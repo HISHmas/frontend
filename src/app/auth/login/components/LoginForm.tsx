@@ -1,6 +1,18 @@
+'use client';
+
 import React from 'react';
 
-export default function LoginForm() {
+export default function LoginForm({
+  loginId,
+  password,
+  onChangeLoginId,
+  onChangePassword,
+}: {
+  loginId: string;
+  password: string;
+  onChangeLoginId: (v: string) => void;
+  onChangePassword: (v: string) => void;
+}) {
   return (
     <div className="w-80 mx-auto p-6 bg-white rounded-xl shadow-md">
       <div className="flex flex-col gap-1 mb-4">
@@ -17,6 +29,8 @@ export default function LoginForm() {
             placeholder-gray-400
           "
           style={{ fontFamily: 'var(--font-ownglyph)' }}
+          value={loginId}
+          onChange={(e) => onChangeLoginId(e.target.value)}
         />
       </div>
 
@@ -34,6 +48,8 @@ export default function LoginForm() {
             placeholder-gray-400
           "
           style={{ fontFamily: 'var(--font-ownglyph)' }}
+          value={password}
+          onChange={(e) => onChangePassword(e.target.value)}
         />
       </div>
     </div>

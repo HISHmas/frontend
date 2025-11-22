@@ -3,11 +3,29 @@
 import LoginForm from './components/LoginForm';
 import LoginButton from './components/LoginButton';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useAuthStore } from '@/src/stores/useAuthStore';
 
 export default function Page() {
-  const handleSubmit = (e: React.FormEvent) => {
+  const router = useRouter();
+  const { login } = useAuthStore();
+
+  const [loginId, setLoginId] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('로그인 시도');
+
+    const slug = await login(loginId, password);
+
+    if (!slug) {
+      alert('로그인 실패');
+      return;
+    }
+
+    // ✅ mock이든 실API든 동일하게 slug로 이동
+    router.push(`/tree/${slug}`);
   };
 
   return (
@@ -25,7 +43,7 @@ export default function Page() {
 
       {/* 로그인 폼 */}
       <div className="mt-10 w-full flex justify-center">
-        <LoginForm />
+        <LoginForm loginId={loginId} password={password} onChangeLoginId={setLoginId} onChangePassword={setPassword} />
       </div>
 
       {/* 로그인 버튼 */}
