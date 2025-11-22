@@ -20,7 +20,7 @@ export default function Page() {
       "
     >
       <p className="text-xl mt-6 text-black" style={{ fontFamily: 'var(--font-ownglyph)' }}>
-        트리를 꾸며주세요!
+        🎄트리를 만들어보세요!🎅🏻
       </p>
 
       {/* 로그인 폼 */}
@@ -34,7 +34,7 @@ export default function Page() {
       </div>
 
       {/* 또는 */}
-      <p className="mt-6 mb-2 text-gray-500 text-sm" style={{ fontFamily: 'var(--font-ownglyph)' }}>
+      <p className="mt-5 mb-4 text-gray-500 text-sm" style={{ fontFamily: 'var(--font-ownglyph)' }}>
         또는
       </p>
 
@@ -43,7 +43,7 @@ export default function Page() {
         <Link
           href="/auth/signup"
           className="
-            w-[200px]  h-10
+            w-full  h-10
             flex items-center justify-center
             rounded-xl
             bg-gray-200 text-gray-700
