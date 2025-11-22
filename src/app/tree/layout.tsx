@@ -23,6 +23,17 @@ export default function TreeLayout({
         />
       </div>
 
+      {/* ⭐ 3) 오른쪽 상단 메일박스 아이콘 */}
+      <div className="absolute top-0 right-0 pt-0 pr-2">
+        <Image
+          src="/images/Mailbox_v02.png"  // 여기에 업로드한 파일 경로
+          alt="mailbox"
+          width={75}
+          height={75}
+          priority
+        />
+      </div>
+
       {/* 3) 414px 모바일 프레임 */}
       <div className="relative z-10 w-full h-full flex justify-center">
         <main className="w-full max-w-[414px] h-full flex flex-col mx-auto relative pt-[56px]">
