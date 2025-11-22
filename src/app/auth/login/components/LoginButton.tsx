@@ -8,9 +8,9 @@ export default function LoginButton({ children }: { children?: React.ReactNode }
         hover:opacity-90 active:opacity-80
         transition
       "
-      style={{ fontFamily: "var(--font-ownglyph)" }}
+      style={{ fontFamily: 'var(--font-ownglyph)' }}
     >
-      {children || "로그인 하기"}
+      {children || '로그인 하기'}
     </button>
   );
 }

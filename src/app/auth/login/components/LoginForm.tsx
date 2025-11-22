@@ -16,7 +16,7 @@ export default function LoginForm() {
             focus:outline-none focus:ring-2 focus:ring-red-500
             placeholder-gray-400
           "
-          style={{ fontFamily: "var(--font-ownglyph)" }}
+          style={{ fontFamily: 'var(--font-ownglyph)' }}
         />
       </div>
 
@@ -33,7 +33,7 @@ export default function LoginForm() {
             focus:outline-none focus:ring-2 focus:ring-red-500
             placeholder-gray-400
           "
-          style={{ fontFamily: "var(--font-ownglyph)" }}
+          style={{ fontFamily: 'var(--font-ownglyph)' }}
         />
       </div>
     </div>
