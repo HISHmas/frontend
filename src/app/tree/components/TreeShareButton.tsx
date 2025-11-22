@@ -1,14 +1,6 @@
-"use client";
+'use client';
 
-export default function TreeShareButton({
-                                          children,
-                                          onClick,
-                                          disabled,
-                                        }: {
-  children?: React.ReactNode;
-  onClick?: () => void;
-  disabled?: boolean;
-}) {
+export default function TreeShareButton({ children, onClick, disabled }: { children?: React.ReactNode; onClick?: () => void; disabled?: boolean }) {
   return (
     <div
       className="
@@ -32,9 +24,9 @@ export default function TreeShareButton({
           disabled:opacity-50 disabled:cursor-not-allowed
           shadow-md
         "
-        style={{ fontFamily: "var(--font-ownglyph)" }}
+        style={{ fontFamily: 'var(--font-ownglyph)' }}
       >
-        {children || "트리 공유하기"}
+        {children || '트리 공유하기'}
       </button>
     </div>
   );
