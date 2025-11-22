@@ -1,31 +1,42 @@
+// src/app/auth/login/page.tsx
 'use client';
 
 import LoginForm from './components/LoginForm';
 import LoginButton from './components/LoginButton';
 import Link from 'next/link';
+import { useAuthStore } from '@/src/stores/useAuthStore';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { useAuthStore } from '@/src/stores/useAuthStore';
 
 export default function Page() {
   const router = useRouter();
-  const { login } = useAuthStore();
+  const login = useAuthStore((s) => s.login);
+  const [loading, setLoading] = useState(false);
 
-  const [loginId, setLoginId] = useState('');
-  const [password, setPassword] = useState('');
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (loading) return;
 
-    const slug = await login(loginId, password);
+    const formData = new FormData(e.currentTarget);
+    const loginId = String(formData.get('login_id') || '');
+    const password = String(formData.get('password') || '');
 
-    if (!slug) {
+    if (!loginId || !password) {
+      alert('아이디/비밀번호를 입력해주세요!');
+      return;
+    }
+
+    setLoading(true);
+    const result = await login(loginId, password);
+    setLoading(false);
+
+    if (!result) {
       alert('로그인 실패');
       return;
     }
 
-    // ✅ mock이든 실API든 동일하게 slug로 이동
-    router.push(`/tree/${slug}`);
+    //  로그인 성공하면 내 트리로 이동
+    router.push(`/tree/${loginId}`);
   };
 
   return (
@@ -43,20 +54,18 @@ export default function Page() {
 
       {/* 로그인 폼 */}
       <div className="mt-10 w-full flex justify-center">
-        <LoginForm loginId={loginId} password={password} onChangeLoginId={setLoginId} onChangePassword={setPassword} />
+        <LoginForm />
       </div>
 
-      {/* 로그인 버튼 */}
+      {/* 로그인 버튼 (디자인 그대로) */}
       <div className="w-full mt-10 flex justify-center">
-        <LoginButton />
+        <LoginButton disabled={loading}>{loading ? '로그인 중...' : '로그인 하기'}</LoginButton>
       </div>
 
-      {/* 또는 */}
       <p className="mt-5 mb-4 text-gray-500 text-sm" style={{ fontFamily: 'var(--font-ownglyph)' }}>
         또는
       </p>
 
-      {/* 회원가입 버튼 */}
       <div className="w-full flex justify-center">
         <Link
           href="/auth/signup"

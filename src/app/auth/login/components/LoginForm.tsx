@@ -1,18 +1,7 @@
-'use client';
-
+// src/app/auth/login/components/LoginForm.tsx
 import React from 'react';
 
-export default function LoginForm({
-  loginId,
-  password,
-  onChangeLoginId,
-  onChangePassword,
-}: {
-  loginId: string;
-  password: string;
-  onChangeLoginId: (v: string) => void;
-  onChangePassword: (v: string) => void;
-}) {
+export default function LoginForm() {
   return (
     <div className="w-80 mx-auto p-6 bg-white rounded-xl shadow-md">
       <div className="flex flex-col gap-1 mb-4">
@@ -22,6 +11,7 @@ export default function LoginForm({
         <input
           type="text"
           id="username"
+          name="login_id"
           placeholder="아이디를 입력해주세요"
           className="
             w-full px-4 py-3 border border-gray-300 rounded-md
@@ -29,8 +19,6 @@ export default function LoginForm({
             placeholder-gray-400
           "
           style={{ fontFamily: 'var(--font-ownglyph)' }}
-          value={loginId}
-          onChange={(e) => onChangeLoginId(e.target.value)}
         />
       </div>
 
@@ -41,6 +29,7 @@ export default function LoginForm({
         <input
           type="password"
           id="password"
+          name="password"
           placeholder="비밀번호를 입력해주세요"
           className="
             w-full px-4 py-3 border border-gray-300 rounded-md
@@ -48,8 +37,6 @@ export default function LoginForm({
             placeholder-gray-400
           "
           style={{ fontFamily: 'var(--font-ownglyph)' }}
-          value={password}
-          onChange={(e) => onChangePassword(e.target.value)}
         />
       </div>
     </div>
