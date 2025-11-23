@@ -5,29 +5,66 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/src/stores/useAuthStore';
 import Image from 'next/image';
+
 import LettersModal from './LettersModal';
+import LetterWriteModal from './LetterWriteModal';
+
+interface Letter {
+  id: string;
+  from: string;
+  content: string;
+  createdAt: string;
+}
 
 export default function MailboxButton() {
-  const params = useParams();
-  const slug = params.slug as string | undefined;
-
+  const slug = useParams().slug as string;
   const { user, isLoaded, loadUser } = useAuthStore();
-  const [open, setOpen] = useState(false);
+
+  const [openRead, setOpenRead] = useState(false);
+  const [openWrite, setOpenWrite] = useState(false);
+
+  // ✅ UI-only mock letters (회원용 모달에 넘길 데이터)
+  const [mockLetters, setMockLetters] = useState<Letter[]>([
+    { id: 'l1', from: '수빈', content: '메리 크리스마스! 올해도 행복하자 🎄', createdAt: '2025-11-20' },
+  ]);
 
   useEffect(() => {
     if (!isLoaded) loadUser();
   }, [isLoaded, loadUser]);
 
-  const isMyTree = !!user && !!slug && user.loginId === slug;
+  const isMyTree = !!user && user.loginId === slug;
+
+  const handleClickAction = () => {
+    if (isMyTree) setOpenRead(true);
+    else setOpenWrite(true);
+  };
+
+  // ✅ UI-only 저장 로직 (나중에 API 붙일 곳)
+  const handleSubmitLetterAction = (payload: Omit<Letter, 'id'>) => {
+    const newLetter: Letter = {
+      id: `l-${Date.now()}`,
+      ...payload,
+    };
+
+    setMockLetters((prev) => [newLetter, ...prev]);
+    alert('편지가 저장되었습니다! 💌 (UI-only)');
+  };
 
   return (
     <>
-      {/* ✅ 위치는 layout이 잡으니까 여기서는 버튼만 */}
-      <button type="button" onClick={() => isMyTree && setOpen(true)} className="pointer-events-auto">
-        <Image src="/images/Mailbox_v02.png" alt="mailbox" width={75} height={75} priority />
+      <button type="button" className="absolute top-0 right-0 pr-2 z-20" onClick={handleClickAction} aria-label={isMyTree ? 'mailbox' : 'write-letter'}>
+        {isMyTree ? (
+          <Image src="/images/Mailbox_v02.png" alt="mailbox" width={75} height={75} priority />
+        ) : (
+          <div className="w-[75px] h-[75px] flex items-center justify-center text-4xl">📝</div>
+        )}
       </button>
 
-      {isMyTree && <LettersModal open={open} onCloseAction={() => setOpen(false)} />}
+      {/* ✅ 회원: 편지함 읽기 (mockLetters 넘김) */}
+      {isMyTree && <LettersModal open={openRead} onCloseAction={() => setOpenRead(false)} letters={mockLetters} />}
+
+      {/* ✅ 비회원: 편지 쓰기 */}
+      {!isMyTree && <LetterWriteModal open={openWrite} onCloseAction={() => setOpenWrite(false)} onSubmitAction={handleSubmitLetterAction} />}
     </>
   );
 }
