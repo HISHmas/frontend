@@ -1,4 +1,3 @@
-// src/app/tree/[slug]/page.tsx
 'use client';
 
 import Image from 'next/image';
@@ -6,7 +5,6 @@ import { useParams } from 'next/navigation';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 
-import TreeDecorateButton from '@/src/app/tree/components/buttons/TreeDecorateButton';
 import TreeShareButton from '@/src/app/tree/components/buttons/TreeShareButton';
 import DecorationBottomSheet, { DECO_LIST, DecoType } from '@/src/app/tree/components/sheets/DecorationBottomSheet';
 
@@ -43,7 +41,9 @@ export default function TreeDetailPage() {
     if (!isLoaded) loadUser();
   }, [isLoaded, loadUser]);
 
-  // 트리 데이터 API로 가져오기
+  /* ============================================================
+     트리 데이터 로딩
+  ============================================================ */
   useEffect(() => {
     const fetchTree = async () => {
       try {
@@ -60,7 +60,9 @@ export default function TreeDetailPage() {
     fetchTree();
   }, [slug]);
 
-  // 장식 선택
+  /* ============================================================
+     장식 선택 → pending 상태로 저장
+  ============================================================ */
   const handlePickDeco = (deco: (typeof DECO_LIST)[number]) => {
     setPendingDeco({
       id: `temp-${Date.now()}`,
@@ -70,7 +72,9 @@ export default function TreeDetailPage() {
     setShowDecoSheet(false);
   };
 
-  // 장식 위치 배치
+  /* ============================================================
+     트리에 장식 배치
+  ============================================================ */
   const handleTreeClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (isMyTree) return;
     if (!pendingDeco || !treeRef.current) return;
@@ -91,9 +95,14 @@ export default function TreeDetailPage() {
     setPendingDeco(null);
   };
 
-  // 저장 API 호출
+  /* ============================================================
+     저장 API 호출 + 실패 시 롤백 (요청하신 부분)
+  ============================================================ */
   const handleSave = async () => {
     if (unsavedDecorations.length === 0) return;
+
+    // 실패하면 제거하기 위해 unsaved ID 저장
+    const unsavedIds = new Set(unsavedDecorations.map((d) => d.id));
 
     try {
       await saveDecorationsApi(
@@ -102,9 +111,15 @@ export default function TreeDetailPage() {
       );
 
       alert('저장 완료!');
-      setUnsavedDecorations([]);
+      setUnsavedDecorations([]); // 성공 시 초기화
     } catch {
       alert('저장 실패');
+
+      // ❗ 실패하면 방금 붙인 장식 제거 (롤백)
+      setDecorations((prev) => prev.filter((d) => !unsavedIds.has(d.id)));
+
+      // ❗ 저장 실패 후 다시 "트리 꾸미기" 버튼으로 돌아가기
+      setUnsavedDecorations([]);
     }
   };
 
@@ -124,7 +139,7 @@ export default function TreeDetailPage() {
         {decorations.map((d) => (
           <div
             key={d.id}
-            className="absolute z-10"
+            className="absolute z-10 w-12 h-12"
             style={{
               left: `${d.x}%`,
               top: `${d.y}%`,
@@ -136,7 +151,7 @@ export default function TreeDetailPage() {
         ))}
       </div>
 
-      {/* ✅ 하단 버튼 (회원=기존 1개, 비회원=2개 반반) */}
+      {/* 하단 버튼 (회원 = 1개 / 비회원 = 2개) */}
       <div className="mt-auto pb-2 shrink-0">
         {isMyTree ? (
           <TreeShareButton>트리 공유하기</TreeShareButton>
@@ -150,35 +165,29 @@ export default function TreeDetailPage() {
             "
           >
             <div className="w-[calc(100%-32px)] max-w-[382px] flex gap-3">
-              {/* 왼쪽: 회원가입 */}
+              {/* 회원가입 */}
               <Link
                 href="/auth/signup"
                 className="
-                  flex-1 h-12
+                  flex-1 h-12 bg-gray-200 text-gray-700
                   flex items-center justify-center
-                  rounded-xl
-                  bg-gray-200 text-gray-700
-                  font-semibold
-                  hover:bg-gray-300
-                  transition
-                  shadow-md
+                  rounded-xl font-semibold
+                  hover:bg-gray-300 transition shadow-md
                 "
                 style={{ fontFamily: 'var(--font-ownglyph)' }}
               >
                 내 트리 만들기
               </Link>
 
-              {/* 오른쪽: 트리 꾸미기 / 저장하기 */}
+              {/* 저장 / 트리 꾸미기 */}
               <button
                 type="button"
                 onClick={unsavedDecorations.length > 0 ? handleSave : () => setShowDecoSheet(true)}
                 className="
-                  flex-1 h-12
-                  bg-green-600 text-white rounded-xl
-                  flex items-center justify-center
+                  flex-1 h-12 bg-green-600 text-white
+                  rounded-xl flex items-center justify-center
                   hover:opacity-90 active:opacity-80
-                  transition font-semibold
-                  shadow-md
+                  transition font-semibold shadow-md
                 "
                 style={{ fontFamily: 'var(--font-ownglyph)' }}
               >
@@ -189,6 +198,7 @@ export default function TreeDetailPage() {
         )}
       </div>
 
+      {/* 장식 선택 모달 */}
       {!isMyTree && <DecorationBottomSheet open={showDecoSheet} onClose={() => setShowDecoSheet(false)} onPick={handlePickDeco} />}
     </div>
   );

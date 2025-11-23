@@ -47,7 +47,7 @@ export default function MailboxButton() {
           id: l.letter_id,
           from: l.sender_name,
           content: l.content,
-          createdAt: l.created_at.split('T')[0], // ✅ 날짜만
+          createdAt: l.created_at.split('T')[0],
         }));
 
         setLetters(mapped);

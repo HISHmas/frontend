@@ -8,15 +8,9 @@ interface LetterWriteModalProps {
   open: boolean;
   onCloseAction: () => void;
 
-  /** ✅ 수신자 slug = login_id */
   receiverSlug: string;
 
-  /** ✅ 저장 성공 후 상위(UI) 반영 */
-  onSubmitAction: (payload: {
-    from: string;
-    content: string;
-    createdAt: string; // "YYYY-MM-DD"
-  }) => void;
+  onSubmitAction: (payload: { from: string; content: string; createdAt: string }) => void;
 }
 
 export default function LetterWriteModal({ open, onCloseAction, onSubmitAction, receiverSlug }: LetterWriteModalProps) {
@@ -35,14 +29,12 @@ export default function LetterWriteModal({ open, onCloseAction, onSubmitAction, 
 
     setLoading(true);
     try {
-      // ✅ POST /api/letters
       const res = await createLetterApi({
         login_id: receiverSlug, // ✅ slug 그대로 보냄
         sender_name: from,
         content,
       });
 
-      // ✅ UI 반영 (백엔드 기준)
       onSubmitAction({
         from: res.letter.sender_name,
         content: res.letter.content,
