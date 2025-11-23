@@ -1,6 +1,6 @@
 // src/api/tree.ts
 import { api } from './common';
-import type { DecoType } from '@/src/app/tree/components/DecorationBottomSheet';
+import type { DecoType } from '@/src/app/tree/components/sheets/DecorationBottomSheet';
 
 export interface DecorationData {
   type: DecoType;

@@ -3,14 +3,15 @@
 
 import { useState } from 'react';
 
-const MOCK_LETTERS = [
-  { id: 'l1', from: '수빈', content: '메리 크리스마스! 올해도 행복하자 🎄', createdAt: '2025-11-20' },
-  { id: 'l2', from: '민지', content: '트리 너무 예쁘다!! 선물 많이 받아 🎁', createdAt: '2025-11-21' },
-  { id: 'l3', from: '영훈', content: '내년엔 같이 여행가자~ ✈️', createdAt: '2025-11-22' },
-];
+interface Letter {
+  id: string;
+  from: string;
+  content: string;
+  createdAt: string;
+}
 
-export default function LettersModal({ open, onCloseAction }: { open: boolean; onCloseAction: () => void }) {
-  const [selected, setSelected] = useState<(typeof MOCK_LETTERS)[number] | null>(null);
+export default function LettersModal({ open, onCloseAction, letters }: { open: boolean; onCloseAction: () => void; letters: Letter[] }) {
+  const [selected, setSelected] = useState<Letter | null>(null);
 
   if (!open) return null;
 
@@ -26,9 +27,8 @@ export default function LettersModal({ open, onCloseAction }: { open: boolean; o
 
       {/* 리스트 OR 상세 */}
       <div className="flex-1 overflow-y-auto p-4">
-        {/* 목록 보기 */}
         {!selected &&
-          MOCK_LETTERS.map((letter) => (
+          letters.map((letter) => (
             <button
               key={letter.id}
               onClick={() => setSelected(letter)}
@@ -38,12 +38,10 @@ export default function LettersModal({ open, onCloseAction }: { open: boolean; o
                 <p className="font-semibold text-gray-800">From. {letter.from}</p>
                 <p className="text-xs text-gray-400">{letter.createdAt}</p>
               </div>
-
               <p className="text-sm text-gray-700 line-clamp-2">{letter.content}</p>
             </button>
           ))}
 
-        {/* 상세 보기 */}
         {selected && (
           <div>
             <div className="mb-4">
@@ -51,13 +49,11 @@ export default function LettersModal({ open, onCloseAction }: { open: boolean; o
               <p className="text-lg font-bold text-gray-800">{selected.from}</p>
               <p className="text-xs text-gray-400 mt-1">{selected.createdAt}</p>
             </div>
-
             <div className="text-gray-800 whitespace-pre-wrap leading-relaxed">{selected.content}</div>
           </div>
         )}
       </div>
 
-      {/* 하단 버튼 */}
       {selected && (
         <button onClick={() => setSelected(null)} className="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold">
           목록으로
