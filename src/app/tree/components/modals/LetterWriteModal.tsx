@@ -70,7 +70,7 @@ export default function LetterWriteModal({ open, onCloseAction, onSubmitAction, 
             value={from}
             onChange={(e) => setFrom(e.target.value)}
             placeholder="이름을 입력해주세요"
-            className="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500  placeholder:text-gray-400"
             style={{ fontFamily: 'var(--font-ownglyph)' }}
           />
         </div>
@@ -82,7 +82,9 @@ export default function LetterWriteModal({ open, onCloseAction, onSubmitAction, 
             onChange={(e) => setContent(e.target.value)}
             placeholder="따뜻한 편지를 남겨주세요 🎄"
             rows={10}
-            className="w-full mt-1 px-3 py-2 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full mt-1 px-3 py-2 border rounded-lg resize-none
+    focus:outline-none focus:ring-2 focus:ring-green-500
+    placeholder:text-gray-400 placeholder:opacity-100"
             style={{ fontFamily: 'var(--font-ownglyph)' }}
           />
         </div>
