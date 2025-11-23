@@ -1,3 +1,4 @@
+// src/app/auth/login/components/LoginForm.tsx
 import React from 'react';
 
 export default function LoginForm() {
@@ -10,6 +11,7 @@ export default function LoginForm() {
         <input
           type="text"
           id="username"
+          name="login_id"
           placeholder="아이디를 입력해주세요"
           className="
             w-full px-4 py-3 border border-gray-300 rounded-md
@@ -27,6 +29,7 @@ export default function LoginForm() {
         <input
           type="password"
           id="password"
+          name="password"
           placeholder="비밀번호를 입력해주세요"
           className="
             w-full px-4 py-3 border border-gray-300 rounded-md

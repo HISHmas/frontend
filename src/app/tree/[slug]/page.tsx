@@ -3,36 +3,63 @@
 
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+
 import TreeDecorateButton from '@/src/app/tree/components/TreeDecorateButton';
 import TreeShareButton from '@/src/app/tree/components/TreeShareButton';
 import DecorationBottomSheet, { DECO_LIST, DecoType } from '@/src/app/tree/components/DecorationBottomSheet';
+
+import { useAuthStore } from '@/src/stores/useAuthStore';
+import { getTreeApi, saveDecorationsApi } from '@/src/api/tree';
 
 interface Decoration {
   id: string;
   type: DecoType;
   src: string;
-  x: number; // %
-  y: number; // %
+  x: number;
+  y: number;
 }
 
-export default function TreeDetailPageUIOnly() {
+export default function TreeDetailPage() {
   const params = useParams();
   const slug = params.slug as string;
 
-  const [isMyTree, setIsMyTree] = useState(false);
+  const { user, isLoaded, loadUser } = useAuthStore();
+  const isMyTree = !!user && user.loginId === slug;
+
   const treeTitle = useMemo(() => `🎄 ${slug} 님의 트리`, [slug]);
 
-  const [decorations, setDecorations] = useState<Decoration[]>([
-    { id: 'd1', type: 'sock', src: '/images/Socks01_small.png', x: 40, y: 35 },
-    { id: 'd2', type: 'circle', src: '/images/Ornament_Yellow_small.png', x: 55, y: 55 },
-  ]);
+  const [decorations, setDecorations] = useState<Decoration[]>([]);
+  const [unsavedDecorations, setUnsavedDecorations] = useState<Decoration[]>([]);
 
+  const [isTreeLoading, setIsTreeLoading] = useState(false);
   const [showDecoSheet, setShowDecoSheet] = useState(false);
   const [pendingDeco, setPendingDeco] = useState<Omit<Decoration, 'x' | 'y'> | null>(null);
 
   const treeRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    if (!isLoaded) loadUser();
+  }, [isLoaded, loadUser]);
+
+  //  트리 데이터 API로 가져오기
+  useEffect(() => {
+    const fetchTree = async () => {
+      try {
+        setIsTreeLoading(true);
+        const data = await getTreeApi(slug);
+        setDecorations(data.decorations ?? []);
+      } catch {
+        setDecorations([]);
+      } finally {
+        setIsTreeLoading(false);
+      }
+    };
+
+    fetchTree();
+  }, [slug]);
+
+  // 장식 선택
   const handlePickDeco = (deco: (typeof DECO_LIST)[number]) => {
     setPendingDeco({
       id: `temp-${Date.now()}`,
@@ -42,36 +69,57 @@ export default function TreeDetailPageUIOnly() {
     setShowDecoSheet(false);
   };
 
+  // 장식 위치 배치
   const handleTreeClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (isMyTree) return;
     if (!pendingDeco || !treeRef.current) return;
 
     const rect = treeRef.current.getBoundingClientRect();
     const x = ((e.clientX - rect.left) / rect.width) * 100;
     const y = ((e.clientY - rect.top) / rect.height) * 100;
 
-    setDecorations((prev) => [...prev, { ...pendingDeco, id: `d-${Date.now()}`, x, y }]);
+    const newDeco: Decoration = {
+      ...pendingDeco,
+      id: `d-${Date.now()}`,
+      x,
+      y,
+    };
+
+    setDecorations((prev) => [...prev, newDeco]);
+    setUnsavedDecorations((prev) => [...prev, newDeco]);
     setPendingDeco(null);
   };
 
+  //  저장 API 호출
+  const handleSave = async () => {
+    if (unsavedDecorations.length === 0) return;
+
+    try {
+      await saveDecorationsApi(
+        slug,
+        unsavedDecorations.map(({ type, src, x, y }) => ({ type, src, x, y })),
+      );
+
+      alert('저장 완료!');
+      setUnsavedDecorations([]);
+    } catch {
+      alert('저장 실패');
+    }
+  };
+
   return (
-    // ✅ bg-white 제거 → layout 배경이 보이게
     <div className="h-full flex flex-col px-4 py-4 bg-transparent">
       {/* 상단 */}
-      <div className="mb-3 text-center shrink-0">
+      <div className="mb-3 text-center">
         <h2 className="text-xl font-bold text-green-800">{treeTitle}</h2>
         <p className="text-sm text-gray-600">장식 {decorations.length}개</p>
-        {pendingDeco && <p className="text-xs text-green-700 mt-1">트리에 붙일 위치를 눌러주세요!</p>}
+        {!isMyTree && pendingDeco && <p className="text-xs text-green-700 mt-1">트리에 붙일 위치를 눌러주세요!</p>}
       </div>
 
-      {/* UI-only 토글 */}
-      <div className="mb-2 flex justify-center shrink-0">
-        <button onClick={() => setIsMyTree((v) => !v)} className="text-xs px-3 py-1 rounded-full bg-gray-100 text-gray-700">
-          {isMyTree ? '내 트리(임시) ✅' : '남의 트리(임시) 🌲'}
-        </button>
-      </div>
+      {/* 트리 캔버스 */}
+      <div ref={treeRef} onClick={handleTreeClick} className="relative w-full flex-1">
+        {isTreeLoading && <div className="absolute inset-0 flex items-center justify-center text-sm text-gray-500">트리 불러오는 중...</div>}
 
-      {/* ✅ 트리 캔버스 (배경은 layout, 여긴 장식만) */}
-      <div ref={treeRef} onClick={handleTreeClick} className="relative w-full flex-1 min-h-0">
         {decorations.map((d) => (
           <div
             key={d.id}
@@ -82,25 +130,23 @@ export default function TreeDetailPageUIOnly() {
               transform: 'translate(-50%, -50%)',
             }}
           >
-            <Image src={d.src} alt={d.type} width={48} height={48} className="object-contain pointer-events-none select-none" />
+            <Image src={d.src} alt={d.type} width={48} height={48} />
           </div>
         ))}
-
-        {pendingDeco && (
-          <div className="absolute bottom-24 left-1/2 -translate-x-1/2 text-xs bg-white/80 px-3 py-1 rounded-full shadow z-20">선택됨: {pendingDeco.type}</div>
-        )}
       </div>
 
       {/* 하단 버튼 */}
-      <div className="mt-auto pb-2 shrink-0">
+      <div className="mt-auto pb-2">
         {isMyTree ? (
           <TreeShareButton>트리 공유하기</TreeShareButton>
+        ) : unsavedDecorations.length > 0 ? (
+          <TreeDecorateButton onClickAction={handleSave}>저장하기</TreeDecorateButton>
         ) : (
-          <TreeDecorateButton onClick={() => setShowDecoSheet(true)}>트리 꾸미기</TreeDecorateButton>
+          <TreeDecorateButton onClickAction={() => setShowDecoSheet(true)}>트리 꾸미기</TreeDecorateButton>
         )}
       </div>
 
-      <DecorationBottomSheet open={showDecoSheet} onClose={() => setShowDecoSheet(false)} onPick={handlePickDeco} />
+      {!isMyTree && <DecorationBottomSheet open={showDecoSheet} onClose={() => setShowDecoSheet(false)} onPick={handlePickDeco} />}
     </div>
   );
 }

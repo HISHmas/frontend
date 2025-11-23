@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import SignupForm from "./components/SignupForm";
-import SignupButton from "./components/SignupButton";
+import SignupForm from './components/SignupForm';
+import SignupButton from './components/SignupButton';
 
 export default function Page() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("로그인 시도");
+    console.log('로그인 시도');
   };
 
   return (
@@ -18,8 +18,8 @@ export default function Page() {
         w-full
       "
     >
-      <p className="text-xl mt-6 text-black" style={{ fontFamily: "var(--font-ownglyph)" }}>
-        트리를 꾸며주세요!
+      <p className="text-xl mt-6 text-black" style={{ fontFamily: 'var(--font-ownglyph)' }}>
+        🎄트리를 만들어보세요!🎅🏻
       </p>
 
       <div className="mt-10 w-full flex justify-center">
