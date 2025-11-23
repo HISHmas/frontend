@@ -10,9 +10,9 @@ export const DECO_LIST: {
   label: string;
   src: string;
 }[] = [
-  { type: 'sock', label: '양말', src: '/images/Socks01_small.png' },
-  { type: 'circle', label: '볼', src: '/images/Ornament_Yellow_small.png' },
-  { type: 'candy', label: '사탕', src: '/images/candycane_v01.png' },
+  { type: 'sock', label: '양말', src: '/images/Socks01.png' },
+  { type: 'circle', label: '볼', src: '/images/Ornament_Yellow.png' },
+  { type: 'candy', label: '사탕', src: '/images/Candycane.png' },
 ];
 
 interface DecorationBottomSheetProps {
@@ -49,7 +49,7 @@ export default function DecorationBottomSheet({ open, onClose, onPick }: Decorat
                 onClick={() => onPick(d)}
                 className="aspect-square bg-gray-50 hover:bg-gray-100 rounded-2xl flex flex-col items-center justify-center transition"
               >
-                <Image src={d.src} alt={d.label} width={100} height={100} className="object-contain" priority={false} />
+                <Image src={d.src} alt={d.label} width={3000} height={3000} className="object-contain" priority={false} />
                 <div className="text-xs mt-1 text-gray-700">{d.label}</div>
               </button>
             ))}
