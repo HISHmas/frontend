@@ -1,32 +1,59 @@
 // src/api/tree.ts
 import { api } from './common';
-import type { DecoType } from '@/src/app/tree/components/sheets/DecorationBottomSheet';
+import type { ApiDecoName } from '@/src/app/tree/contants/decorations';
 
-export interface DecorationData {
-  type: DecoType;
-  src: string;
-  x: number;
-  y: number;
+/** 백엔드 오브젝트 1개 */
+export interface ApiObject {
+  object_id: string;
+  name: ApiDecoName;
+  position_x: number;
+  position_y: number;
 }
 
-export interface TreeResponse {
-  title: string;
-  decorations: Array<
-    DecorationData & {
-      id: string;
-    }
-  >;
+/** GET /objects 응답 */
+export interface GetObjectsResponse {
+  objects: ApiObject[];
 }
 
-// 트리 불러오기
-export function getTreeApi(slug: string) {
-  return api<TreeResponse>(`/tree/${slug}`);
+/** POST /objects 요청 */
+export interface CreateObjectRequest {
+  login_id: string; // slug 그대로
+  name: ApiDecoName; // "SOCK" | "CIRCLE" | "CANDY"
+  position_x: number; // px
+  position_y: number; // px
 }
 
-// 장식 저장하기 (비회원 bulk 저장)
-export function saveDecorationsApi(slug: string, decorations: DecorationData[]) {
-  return api<void, { decorations: DecorationData[] }>(`/tree/${slug}/decorations`, {
+/** POST /objects 응답 */
+export interface CreateObjectResponse {
+  message: string;
+  object: ApiObject;
+}
+
+/** ✅ 트리(오브젝트) 불러오기 */
+export function getObjectsApi(login_id: string) {
+  // 백엔드가 쿠키 기반이면 query 없이 /objects 만 써도 됨
+  return api<GetObjectsResponse>(`/objects?login_id=${login_id}`);
+}
+
+/** ✅ 오브젝트 1개 저장 */
+export function createObjectApi(body: CreateObjectRequest) {
+  return api<CreateObjectResponse, CreateObjectRequest>('/objects', {
     method: 'POST',
-    body: { decorations },
+    body,
   });
+}
+
+/**
+ * ✅ 여러 개 저장 (비회원이 붙인 것만)
+ * backend는 1개씩만 받으므로 Promise.all 로 병렬 저장
+ */
+export async function saveDecorationsApi(login_id: string, objects: Omit<CreateObjectRequest, 'login_id'>[]) {
+  await Promise.all(
+    objects.map((obj) =>
+      createObjectApi({
+        login_id,
+        ...obj,
+      }),
+    ),
+  );
 }
