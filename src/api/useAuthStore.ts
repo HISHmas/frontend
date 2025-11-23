@@ -14,43 +14,43 @@ interface AuthState {
   logout: () => Promise<void>;
 }
 
-const USE_MOCK = true;
-
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isLoaded: false,
 
+  // 로그인 상태 유지
   loadUser: async () => {
-    if (USE_MOCK) {
-      set({ user: null, isLoaded: true });
-      return;
-    }
-
     try {
       const data = await meApi();
-      set({ user: { loginId: data.login_id }, isLoaded: true });
+      set({
+        user: { loginId: data.user.login_id },
+        isLoaded: true,
+      });
     } catch {
       set({ user: null, isLoaded: true });
     }
   },
 
+  // 로그인
   login: async (id, pw) => {
-    if (USE_MOCK) {
-      set({ user: { loginId: id }, isLoaded: true });
-      return id;
-    }
-
     try {
       const data = await loginApi({ login_id: id, password: pw });
-      set({ user: { loginId: data.login_id }, isLoaded: true });
-      return data.login_id;
-    } catch {
+
+      set({
+        user: { loginId: data.user.login_id },
+        isLoaded: true,
+      });
+
+      // 로그인 성공 시 로그인 ID 반환
+      return data.user.login_id;
+    } catch (e) {
       return null;
     }
   },
 
+  // 로그아웃
   logout: async () => {
-    if (!USE_MOCK) await logoutApi();
+    await logoutApi();
     set({ user: null, isLoaded: true });
   },
 }));
