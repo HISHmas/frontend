@@ -4,8 +4,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL as string;
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
-// Body가 없는 요청일 경우 타입을 void로 제한
-type RequestBody = Record<string, unknown> | undefined | null;
+type RequestBody = object | undefined | null;
 
 interface RequestOptions<TBody extends RequestBody = undefined> {
   method?: HttpMethod;
@@ -14,7 +13,6 @@ interface RequestOptions<TBody extends RequestBody = undefined> {
   credentials?: RequestCredentials;
 }
 
-// 응답은 제네릭으로 강제
 export async function api<TResponse, TBody extends RequestBody = undefined>(path: string, options: RequestOptions<TBody> = {}): Promise<TResponse> {
   const res = await fetch(`${BASE_URL}${path}`, {
     method: options.method ?? 'GET',
@@ -30,5 +28,5 @@ export async function api<TResponse, TBody extends RequestBody = undefined>(path
     throw new Error(`API Error: ${res.status} (${path})`);
   }
 
-  return res.json() as Promise<TResponse>;
+  return (await res.json()) as TResponse;
 }
