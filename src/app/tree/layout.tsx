@@ -1,5 +1,5 @@
 import Header from '@/src/components/common/Header';
-import MailboxButton from '@/src/app/tree/components/MailboxButton';
+import MailboxButton from '@/src/app/tree/components/buttons/MailboxButton';
 import Image from 'next/image';
 
 export default function TreeLayout({ children }: { children: React.ReactNode }) {

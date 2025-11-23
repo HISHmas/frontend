@@ -5,9 +5,9 @@ import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
-import TreeDecorateButton from '@/src/app/tree/components/TreeDecorateButton';
-import TreeShareButton from '@/src/app/tree/components/TreeShareButton';
-import DecorationBottomSheet, { DECO_LIST, DecoType } from '@/src/app/tree/components/DecorationBottomSheet';
+import TreeDecorateButton from '@/src/app/tree/components/buttons/TreeDecorateButton';
+import TreeShareButton from '@/src/app/tree/components/buttons/TreeShareButton';
+import DecorationBottomSheet, { DECO_LIST, DecoType } from '@/src/app/tree/components/sheets/DecorationBottomSheet';
 
 import { useAuthStore } from '@/src/stores/useAuthStore';
 import { getTreeApi, saveDecorationsApi } from '@/src/api/tree';

@@ -1,5 +1,5 @@
 // src/app/tree/page.tsx
-import TreeShareButton from '@/src/app/tree/components/TreeShareButton';
+import TreeShareButton from '@/src/app/tree/components/buttons/TreeShareButton';
 
 export default function TreePage() {
   return (
