@@ -8,12 +8,13 @@ import Image from 'next/image';
 
 import LettersModal from '../modals/LettersModal';
 import LetterWriteModal from '../modals/LetterWriteModal';
+import { getLettersApi } from '@/src/api/letters';
 
 interface Letter {
   id: string;
   from: string;
   content: string;
-  createdAt: string;
+  createdAt: string; // "YYYY-MM-DD"
 }
 
 export default function MailboxButton() {
@@ -23,10 +24,7 @@ export default function MailboxButton() {
   const [openRead, setOpenRead] = useState(false);
   const [openWrite, setOpenWrite] = useState(false);
 
-  // ✅ UI-only mock letters (회원용 모달 데이터)
-  const [mockLetters, setMockLetters] = useState<Letter[]>([
-    { id: 'l1', from: '수빈', content: '메리 크리스마스! 올해도 행복하자 🎄', createdAt: '2025-11-20' },
-  ]);
+  const [letters, setLetters] = useState<Letter[]>([]);
 
   useEffect(() => {
     if (!isLoaded) loadUser();
@@ -34,33 +32,60 @@ export default function MailboxButton() {
 
   const isMyTree = !!user && user.loginId === slug;
 
+  /**
+   * ✅ 내 트리일 때만 편지 목록 조회
+   * - 쿠키 기반이라 getLettersApi()만 호출
+   */
+  useEffect(() => {
+    if (!isMyTree) return;
+
+    const fetchLetters = async () => {
+      try {
+        const res = await getLettersApi();
+
+        const mapped: Letter[] = (res.letters ?? []).map((l) => ({
+          id: l.letter_id,
+          from: l.sender_name,
+          content: l.content,
+          createdAt: l.created_at.split('T')[0], // ✅ 날짜만
+        }));
+
+        setLetters(mapped);
+      } catch {
+        setLetters([]);
+      }
+    };
+
+    fetchLetters();
+  }, [isMyTree]);
+
   const handleClickAction = () => {
     if (isMyTree) setOpenRead(true);
     else setOpenWrite(true);
   };
 
-  // ✅ UI-only 저장 로직 (나중에 API 붙일 곳)
   const handleSubmitLetterAction = (payload: Omit<Letter, 'id'>) => {
     const newLetter: Letter = {
       id: `l-${Date.now()}`,
       ...payload,
     };
-    setMockLetters((prev) => [newLetter, ...prev]);
-    alert('편지가 저장되었습니다! (UI-only)');
+    setLetters((prev) => [newLetter, ...prev]);
   };
 
   return (
     <>
-      {/* ✅ 우체통 이미지는 항상 동일하게 표시 */}
+      {/* 우체통 아이콘 */}
       <button type="button" onClick={handleClickAction} aria-label="mailbox" className="transition-transform active:scale-95">
         <Image src="/images/Mailbox_v02.png" alt="mailbox" width={75} height={75} priority />
       </button>
 
       {/* ✅ 회원: 편지함 읽기 */}
-      {isMyTree && <LettersModal open={openRead} onCloseAction={() => setOpenRead(false)} letters={mockLetters} />}
+      {isMyTree && <LettersModal open={openRead} onCloseAction={() => setOpenRead(false)} letters={letters} />}
 
       {/* ✅ 비회원: 편지 쓰기 */}
-      {!isMyTree && <LetterWriteModal open={openWrite} onCloseAction={() => setOpenWrite(false)} onSubmitAction={handleSubmitLetterAction} />}
+      {!isMyTree && (
+        <LetterWriteModal open={openWrite} onCloseAction={() => setOpenWrite(false)} receiverSlug={slug} onSubmitAction={handleSubmitLetterAction} />
+      )}
     </>
   );
 }
