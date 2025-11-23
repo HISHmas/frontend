@@ -9,7 +9,7 @@ const MOCK_LETTERS = [
   { id: 'l3', from: '영훈', content: '내년엔 같이 여행가자~ ✈️', createdAt: '2025-11-22' },
 ];
 
-export default function LettersModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+export default function LettersModal({ open, onCloseAction }: { open: boolean; onCloseAction: () => void }) {
   const [selected, setSelected] = useState<(typeof MOCK_LETTERS)[number] | null>(null);
 
   if (!open) return null;
@@ -19,7 +19,7 @@ export default function LettersModal({ open, onClose }: { open: boolean; onClose
       {/* 상단 헤더 */}
       <div className="flex items-center justify-between px-5 py-4 border-b">
         <h3 className="text-lg font-bold text-green-800">📮 편지함</h3>
-        <button onClick={onClose} className="text-2xl text-gray-500 hover:text-gray-700">
+        <button onClick={onCloseAction} className="text-2xl text-gray-500 hover:text-gray-700">
           ✕
         </button>
       </div>

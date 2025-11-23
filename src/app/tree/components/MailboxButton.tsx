@@ -27,7 +27,7 @@ export default function MailboxButton() {
         <Image src="/images/Mailbox_v02.png" alt="mailbox" width={75} height={75} priority />
       </button>
 
-      {isMyTree && <LettersModal open={open} onClose={() => setOpen(false)} />}
+      {isMyTree && <LettersModal open={open} onCloseAction={() => setOpen(false)} />}
     </>
   );
 }

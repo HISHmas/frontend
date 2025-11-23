@@ -1,6 +1,6 @@
 'use client';
 
-export default function TreeShareButton({ children, onClick, disabled }: { children?: React.ReactNode; onClick?: () => void; disabled?: boolean }) {
+export default function TreeShareButton({ children, onClickAction, disabled }: { children?: React.ReactNode; onClickAction?: () => void; disabled?: boolean }) {
   return (
     <div
       className="
@@ -13,7 +13,7 @@ export default function TreeShareButton({ children, onClick, disabled }: { child
     >
       <button
         type="button"
-        onClick={onClick}
+        onClick={onClickAction}
         disabled={disabled}
         className="
           w-[calc(100%-32px)] max-w-[382px] h-12

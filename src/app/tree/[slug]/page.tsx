@@ -140,9 +140,9 @@ export default function TreeDetailPage() {
         {isMyTree ? (
           <TreeShareButton>트리 공유하기</TreeShareButton>
         ) : unsavedDecorations.length > 0 ? (
-          <TreeDecorateButton onClick={handleSave}>저장하기</TreeDecorateButton>
+          <TreeDecorateButton onClickAction={handleSave}>저장하기</TreeDecorateButton>
         ) : (
-          <TreeDecorateButton onClick={() => setShowDecoSheet(true)}>트리 꾸미기</TreeDecorateButton>
+          <TreeDecorateButton onClickAction={() => setShowDecoSheet(true)}>트리 꾸미기</TreeDecorateButton>
         )}
       </div>
 
