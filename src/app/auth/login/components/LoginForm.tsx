@@ -16,7 +16,7 @@ export default function LoginForm() {
           className="
             w-full px-4 py-3 border border-gray-300 rounded-md
             focus:outline-none focus:ring-2 focus:ring-red-500
-            placeholder-gray-400
+            placeholder-gray-400 text-gray-900
           "
           style={{ fontFamily: 'var(--font-ownglyph)' }}
         />
@@ -34,7 +34,7 @@ export default function LoginForm() {
           className="
             w-full px-4 py-3 border border-gray-300 rounded-md
             focus:outline-none focus:ring-2 focus:ring-red-500
-            placeholder-gray-400
+            placeholder-gray-400 text-gray-900
           "
           style={{ fontFamily: 'var(--font-ownglyph)' }}
         />

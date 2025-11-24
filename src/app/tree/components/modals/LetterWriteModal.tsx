@@ -8,15 +8,9 @@ interface LetterWriteModalProps {
   open: boolean;
   onCloseAction: () => void;
 
-  /** ✅ 수신자 slug = login_id */
   receiverSlug: string;
 
-  /** ✅ 저장 성공 후 상위(UI) 반영 */
-  onSubmitAction: (payload: {
-    from: string;
-    content: string;
-    createdAt: string; // "YYYY-MM-DD"
-  }) => void;
+  onSubmitAction: (payload: { from: string; content: string; createdAt: string }) => void;
 }
 
 export default function LetterWriteModal({ open, onCloseAction, onSubmitAction, receiverSlug }: LetterWriteModalProps) {
@@ -35,14 +29,12 @@ export default function LetterWriteModal({ open, onCloseAction, onSubmitAction, 
 
     setLoading(true);
     try {
-      // ✅ POST /api/letters
       const res = await createLetterApi({
         login_id: receiverSlug, // ✅ slug 그대로 보냄
         sender_name: from,
         content,
       });
 
-      // ✅ UI 반영 (백엔드 기준)
       onSubmitAction({
         from: res.letter.sender_name,
         content: res.letter.content,
@@ -78,7 +70,7 @@ export default function LetterWriteModal({ open, onCloseAction, onSubmitAction, 
             value={from}
             onChange={(e) => setFrom(e.target.value)}
             placeholder="이름을 입력해주세요"
-            className="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500  placeholder:text-gray-400"
             style={{ fontFamily: 'var(--font-ownglyph)' }}
           />
         </div>
@@ -90,7 +82,9 @@ export default function LetterWriteModal({ open, onCloseAction, onSubmitAction, 
             onChange={(e) => setContent(e.target.value)}
             placeholder="따뜻한 편지를 남겨주세요 🎄"
             rows={10}
-            className="w-full mt-1 px-3 py-2 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full mt-1 px-3 py-2 border rounded-lg resize-none
+    focus:outline-none focus:ring-2 focus:ring-green-500
+    placeholder:text-gray-400 placeholder:opacity-100"
             style={{ fontFamily: 'var(--font-ownglyph)' }}
           />
         </div>

@@ -2,24 +2,15 @@
 'use client';
 
 import Image from 'next/image';
-import { useParams } from 'next/navigation';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import { useEffect } from 'react';
 
-import TreeDecorateButton from '@/src/app/tree/components/buttons/TreeDecorateButton';
 import TreeShareButton from '@/src/app/tree/components/buttons/TreeShareButton';
-import DecorationBottomSheet, { DECO_LIST, DecoType } from '@/src/app/tree/components/sheets/DecorationBottomSheet';
+import DecorationBottomSheet, { DECO_LIST } from '@/src/app/tree/components/sheets/DecorationBottomSheet';
 
 import { useAuthStore } from '@/src/stores/useAuthStore';
-import { getTreeApi, saveDecorationsApi } from '@/src/api/tree';
-
-interface Decoration {
-  id: string;
-  type: DecoType;
-  src: string;
-  x: number;
-  y: number;
-}
+import { useTreeDecorations } from '@/src/app/tree/hooks/useTreeDecorations';
 
 export default function TreeDetailPage() {
   const params = useParams();
@@ -28,85 +19,23 @@ export default function TreeDetailPage() {
   const { user, isLoaded, loadUser } = useAuthStore();
   const isMyTree = !!user && user.loginId === slug;
 
-  const treeTitle = useMemo(() => `🎄 ${slug} 님의 트리`, [slug]);
-
-  const [decorations, setDecorations] = useState<Decoration[]>([]);
-  const [unsavedDecorations, setUnsavedDecorations] = useState<Decoration[]>([]);
-
-  const [isTreeLoading, setIsTreeLoading] = useState(false);
-  const [showDecoSheet, setShowDecoSheet] = useState(false);
-  const [pendingDeco, setPendingDeco] = useState<Omit<Decoration, 'x' | 'y'> | null>(null);
-
-  const treeRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     if (!isLoaded) loadUser();
   }, [isLoaded, loadUser]);
 
-  // 트리 데이터 API로 가져오기
-  useEffect(() => {
-    const fetchTree = async () => {
-      try {
-        setIsTreeLoading(true);
-        const data = await getTreeApi(slug);
-        setDecorations(data.decorations ?? []);
-      } catch {
-        setDecorations([]);
-      } finally {
-        setIsTreeLoading(false);
-      }
-    };
-
-    fetchTree();
-  }, [slug]);
-
-  // 장식 선택
-  const handlePickDeco = (deco: (typeof DECO_LIST)[number]) => {
-    setPendingDeco({
-      id: `temp-${Date.now()}`,
-      type: deco.type,
-      src: deco.src,
-    });
-    setShowDecoSheet(false);
-  };
-
-  // 장식 위치 배치
-  const handleTreeClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (isMyTree) return;
-    if (!pendingDeco || !treeRef.current) return;
-
-    const rect = treeRef.current.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-
-    const newDeco: Decoration = {
-      ...pendingDeco,
-      id: `d-${Date.now()}`,
-      x,
-      y,
-    };
-
-    setDecorations((prev) => [...prev, newDeco]);
-    setUnsavedDecorations((prev) => [...prev, newDeco]);
-    setPendingDeco(null);
-  };
-
-  // 저장 API 호출
-  const handleSave = async () => {
-    if (unsavedDecorations.length === 0) return;
-
-    try {
-      await saveDecorationsApi(
-        slug,
-        unsavedDecorations.map(({ type, src, x, y }) => ({ type, src, x, y })),
-      );
-
-      alert('저장 완료!');
-      setUnsavedDecorations([]);
-    } catch {
-      alert('저장 실패');
-    }
-  };
+  const {
+    treeRef,
+    treeTitle,
+    decorations,
+    unsavedDecorations,
+    pendingDeco,
+    isTreeLoading,
+    showDecoSheet,
+    setShowDecoSheet,
+    pickDecoration,
+    placeDecoration,
+    saveDecorations,
+  } = useTreeDecorations(slug, isMyTree);
 
   return (
     <div className="h-full flex flex-col px-4 py-4 bg-transparent">
@@ -118,25 +47,25 @@ export default function TreeDetailPage() {
       </div>
 
       {/* 트리 캔버스 */}
-      <div ref={treeRef} onClick={handleTreeClick} className="relative w-full flex-1">
+      <div ref={treeRef} onClick={placeDecoration} className="relative w-full flex-1">
         {isTreeLoading && <div className="absolute inset-0 flex items-center justify-center text-sm text-gray-500">트리 불러오는 중...</div>}
 
         {decorations.map((d) => (
           <div
             key={d.id}
-            className="absolute z-10"
+            className="absolute z-10 w-12 h-12"
             style={{
               left: `${d.x}%`,
               top: `${d.y}%`,
               transform: 'translate(-50%, -50%)',
             }}
           >
-            <Image src={d.src} alt={d.type} width={48} height={48} />
+            <Image src={d.src} alt={d.type} width={48} height={48} className="object-contain" />
           </div>
         ))}
       </div>
 
-      {/* ✅ 하단 버튼 (회원=기존 1개, 비회원=2개 반반) */}
+      {/* 하단 버튼 (회원=1개 / 비회원=2개 반반) */}
       <div className="mt-auto pb-2 shrink-0">
         {isMyTree ? (
           <TreeShareButton>트리 공유하기</TreeShareButton>
@@ -150,35 +79,29 @@ export default function TreeDetailPage() {
             "
           >
             <div className="w-[calc(100%-32px)] max-w-[382px] flex gap-3">
-              {/* 왼쪽: 회원가입 */}
+              {/* 왼쪽: 내 트리 만들기 */}
               <Link
                 href="/auth/signup"
                 className="
-                  flex-1 h-12
+                  flex-1 h-12 bg-gray-200 text-gray-700
                   flex items-center justify-center
-                  rounded-xl
-                  bg-gray-200 text-gray-700
-                  font-semibold
-                  hover:bg-gray-300
-                  transition
-                  shadow-md
+                  rounded-xl font-semibold
+                  hover:bg-gray-300 transition shadow-md
                 "
                 style={{ fontFamily: 'var(--font-ownglyph)' }}
               >
                 내 트리 만들기
               </Link>
 
-              {/* 오른쪽: 트리 꾸미기 / 저장하기 */}
+              {/* 오른쪽: 꾸미기 / 저장하기 */}
               <button
                 type="button"
-                onClick={unsavedDecorations.length > 0 ? handleSave : () => setShowDecoSheet(true)}
+                onClick={unsavedDecorations.length > 0 ? saveDecorations : () => setShowDecoSheet(true)}
                 className="
-                  flex-1 h-12
-                  bg-green-600 text-white rounded-xl
-                  flex items-center justify-center
+                  flex-1 h-12 bg-green-600 text-white
+                  rounded-xl flex items-center justify-center
                   hover:opacity-90 active:opacity-80
-                  transition font-semibold
-                  shadow-md
+                  transition font-semibold shadow-md
                 "
                 style={{ fontFamily: 'var(--font-ownglyph)' }}
               >
@@ -189,7 +112,8 @@ export default function TreeDetailPage() {
         )}
       </div>
 
-      {!isMyTree && <DecorationBottomSheet open={showDecoSheet} onClose={() => setShowDecoSheet(false)} onPick={handlePickDeco} />}
+      {/* 장식 선택 바텀시트 */}
+      {!isMyTree && <DecorationBottomSheet open={showDecoSheet} onClose={() => setShowDecoSheet(false)} onPick={(d) => pickDecoration(d)} />}
     </div>
   );
 }
