@@ -1,7 +1,7 @@
 
 # 🎄 HISHmas Frontend 개발 환경 & 협업 가이드
 
-> **Next.js + TypeScript 기반의 HISHmas Frontend 개발 팀을 위한 표준 가이드라인입니다.**
+> **Next.js + TypeScript + Tailwind 기반의 HISHmas Frontend 개발 팀을 위한 표준 가이드라인입니다.**
 > 깔끔한 협업, 안정적인 코드 품질, 일관된 개발 문화를 지향합니다.
 
 ---
@@ -57,11 +57,7 @@
 * 미리보기(Preview) URL 자동 생성
 
 ---
-아래는 **README에 추가할 “프로젝트 구조(Project Structure)” 섹션**을
-지금 너 프론트엔드 구조 그대로 반영해서 **예쁘고 일관성 있게** 만들어둔 버전이야.
-그대로 복붙하면 돼!
 
----
 
 # 📁 프로젝트 구조 (Project Structure)
 
