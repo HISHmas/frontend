@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 
 export default function SignupForm({
@@ -30,7 +28,7 @@ export default function SignupForm({
           onChange={(e) => setName(e.target.value)}
           placeholder="이름을 입력해주세요"
           className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500
-            placeholder-gray-400"
+            placeholder-gray-400 text-gray-900"
           style={{ fontFamily: 'var(--font-ownglyph)' }}
         />
       </div>
@@ -44,7 +42,7 @@ export default function SignupForm({
           onChange={(e) => setLoginId(e.target.value)}
           placeholder="아이디를 입력해주세요"
           className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500
-            placeholder-gray-400"
+            placeholder-gray-400 text-gray-900"
           style={{ fontFamily: 'var(--font-ownglyph)' }}
         />
       </div>
@@ -58,7 +56,7 @@ export default function SignupForm({
           onChange={(e) => setPassword(e.target.value)}
           placeholder="비밀번호를 입력해주세요"
           className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500
-            placeholder-gray-400"
+            placeholder-gray-400 text-gray-900"
           style={{ fontFamily: 'var(--font-ownglyph)' }}
         />
       </div>
